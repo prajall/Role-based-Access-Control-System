@@ -41,3 +41,31 @@ export const checkPermission = (module: string, action: string) => {
     }
   };
 };
+
+export const adminChecker = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = user;
+
+    if (!user || !user.id) {
+      return res.status(403).json({ message: "Not Authenticated" });
+    }
+
+    const user = await User.findById(user.id);
+
+    if (!user) {
+      return res.status(403).json({ message: "User not found" });
+    }
+
+    if (user.role !== "admin") {
+      return res.status(403).json({ message: "Access Denied: Admins only" });
+    }
+
+    next();
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
