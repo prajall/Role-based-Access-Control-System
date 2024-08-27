@@ -51,17 +51,18 @@ export const adminChecker = async (
   try {
     const user = req.user;
 
-    if (!user || !user.id) {
+    console.log(user._id);
+    if (!user || !user._id) {
       return res.status(403).json({ message: "Not Authenticated" });
     }
 
-    const dbUser = await User.findById(user.id);
+    const userDoc = await User.findById(user._id);
 
-    if (!dbUser) {
+    if (!userDoc) {
       return res.status(403).json({ message: "User not found" });
     }
-
-    if (dbUser.role !== "admin" || "master") {
+    console.log(userDoc);
+    if (userDoc.role != "admin" && userDoc.role != "master") {
       return res.status(403).json({ message: "Access Denied: Admins only" });
     }
 
@@ -83,13 +84,13 @@ export const masterChecker = async (
       return res.status(403).json({ message: "Not Authenticated" });
     }
 
-    const dbUser = await User.findById(user.id);
+    const userDoc = await User.findById(user.id);
 
-    if (!dbUser) {
+    if (!userDoc) {
       return res.status(403).json({ message: "User not found" });
     }
 
-    if (dbUser.role !== "master") {
+    if (userDoc.role !== "master") {
       return res
         .status(403)
         .json({ message: 'Forbidden. Only for "Master" role' });

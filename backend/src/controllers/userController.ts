@@ -98,44 +98,45 @@ export const deleteUser = async (req: Request, res: Response) => {
 };
 
 export const updateUserRole = async (req: Request, res: Response) => {
-  const { newRoleId } = req.body;
-  const { userIdToUpdate } = req.params;
+  const { newRole } = req.body;
+  const userIdToUpdate = req.params.userId;
+  console.log("userIdToUpdate", userIdToUpdate);
   const user = req.user;
 
   try {
-    const newRole = await Role.findById(newRoleId);
-    if (!newRole) {
+    console.log("user update");
+    if (!user) {
+      return res.status(404).json({ message: "Please Login" });
+    }
+    const newRoleDocs = await Role.findOne({ name: newRole });
+    if (!newRoleDocs) {
       return res.status(400).json({ message: "Invalid role specified" });
     }
-    if (newRole.name === "master") {
+    if (newRoleDocs.name === "master") {
       return res.status(403).json({ message: "Cannot assign Master role" });
     }
 
-    const userToUpdate = await User.findById(userIdToUpdate);
-
-    if (!userToUpdate) {
-      return res.status(404).json({ message: "User not found" });
+    const userDoc = await User.findById(userIdToUpdate).select("-password");
+    if (!userDoc) {
+      return res.status(404).json({ message: "User to Update not found" });
     }
 
-    if (userToUpdate.role === "admin" && user.role != "master") {
+    if (userDoc.role === "admin" && user.role != "master") {
       return res.status(403).json({
         message: "Access Denied. Only master can change Admin's role",
       });
     }
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    userDoc.role = newRoleDocs.name;
+    userDoc.roleId = newRoleDocs._id;
 
-    user.role = newRoleId;
-    user.roleId = newRole._id;
-
-    await user.save();
+    await userDoc.save();
 
     return res
       .status(200)
-      .json({ message: "User role updated successfully", user });
+      .json({ message: "User role updated successfully", userDoc });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Internal Server Error", error });
   }
 };

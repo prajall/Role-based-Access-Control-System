@@ -6,7 +6,7 @@ export const authChecker = async (req: any, res: any, next: any) => {
   const authToken = req.cookies.token;
 
   if (!authToken) {
-    return res.status(403).json({ message: "Not Authenticated" });
+    return res.status(403).json({ message: "Please Login" });
   }
 
   try {
@@ -22,7 +22,9 @@ export const authChecker = async (req: any, res: any, next: any) => {
     }
     const filteredUser = dbUser.toObject();
     delete filteredUser.password;
+
     req.user = filteredUser;
+
     next();
   } catch (error) {
     console.log(error);
