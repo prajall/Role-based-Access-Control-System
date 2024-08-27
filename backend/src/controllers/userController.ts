@@ -8,7 +8,7 @@ import { Role } from "../models/roleModel";
 // Generate JWT token
 const generateToken = (id: string) => {
   return jwt.sign({ id }, process.env.JWT_SECRET as string, {
-    expiresIn: "30d", // Set the token expiry as per your requirements
+    expiresIn: "30d",
   });
 };
 

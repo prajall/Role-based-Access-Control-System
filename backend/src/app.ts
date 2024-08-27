@@ -1,10 +1,10 @@
-import express from "express";
-import cors from "cors";
-import { authChecker } from "./middlewares/authChecker";
-import userRoute from "./routes/userRoute";
 import cookieParser from "cookie-parser";
+import cors from "cors";
+import express from "express";
 import permissionRoute from "./routes/permissionRoute";
+import productRoute from "./routes/productRoute";
 import roleRoute from "./routes/roleRoute";
+import userRoute from "./routes/userRoute";
 
 const app = express();
 
@@ -24,3 +24,4 @@ app.use(cookieParser());
 app.use("/user", userRoute);
 app.use("/permission", permissionRoute);
 app.use("/role", roleRoute);
+app.use("/product", productRoute);

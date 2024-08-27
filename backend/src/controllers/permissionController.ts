@@ -9,6 +9,11 @@ export const createPermission = async (req: Request, res: Response) => {
   }
 
   try {
+    const duplicateData = await Permission.findOne({ module, action });
+    if (duplicateData) {
+      return res.status(409).json({ message: "Permission already Exists" });
+    }
+
     const newPermission = new Permission({ module, action });
     await newPermission.save();
     return res.status(201).json({
