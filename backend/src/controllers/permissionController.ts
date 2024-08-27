@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Permission } from "../models/permission.model";
+import { Permission } from "../models/permissionModel";
 
 export const createPermission = async (req: Request, res: Response) => {
   const { module, action } = req.body;

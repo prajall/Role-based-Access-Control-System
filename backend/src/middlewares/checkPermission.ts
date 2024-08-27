@@ -1,6 +1,6 @@
-//@ts-nocheck
 import { NextFunction, Request, Response } from "express";
-import { Role } from "../models/role.model";
+import { Role } from "../models/roleModel";
+import { User } from "../models/userModel";
 
 export const checkPermission = (module: string, action: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -16,6 +16,7 @@ export const checkPermission = (module: string, action: string) => {
       const userPermissions = await Role.findById(userRole).populate(
         "permissions"
       );
+      console.log(userPermissions);
 
       if (!userPermissions) {
         return res
@@ -29,13 +30,13 @@ export const checkPermission = (module: string, action: string) => {
         }
       );
 
-      if (hasPermission) {
-        return next();
+      if (!hasPermission) {
+        return res.status(403).json({
+          message:
+            "Access Denied. You do not have permission to perform this action",
+        });
       }
-
-      return res
-        .status(403)
-        .json({ message: "Access Denied: Insufficient Permissions" });
+      next();
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error" });
     }
@@ -48,20 +49,50 @@ export const adminChecker = async (
   next: NextFunction
 ) => {
   try {
-    const user = user;
+    const user = req.user;
 
     if (!user || !user.id) {
       return res.status(403).json({ message: "Not Authenticated" });
     }
 
-    const user = await User.findById(user.id);
+    const dbUser = await User.findById(user.id);
 
-    if (!user) {
+    if (!dbUser) {
       return res.status(403).json({ message: "User not found" });
     }
 
-    if (user.role !== "admin") {
+    if (dbUser.role !== "admin" || "master") {
       return res.status(403).json({ message: "Access Denied: Admins only" });
+    }
+
+    next();
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
+
+export const masterChecker = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = req.user;
+
+    if (!user || !user.id) {
+      return res.status(403).json({ message: "Not Authenticated" });
+    }
+
+    const dbUser = await User.findById(user.id);
+
+    if (!dbUser) {
+      return res.status(403).json({ message: "User not found" });
+    }
+
+    if (dbUser.role !== "master") {
+      return res
+        .status(403)
+        .json({ message: 'Forbidden. Only for "Master" role' });
     }
 
     next();

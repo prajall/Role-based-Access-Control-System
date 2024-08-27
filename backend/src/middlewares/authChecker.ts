@@ -1,8 +1,9 @@
-import { NextFunction, Request, Response } from "express";
+//@ts-nocheck
 import jwt from "jsonwebtoken";
+import { User } from "../models/userModel";
 
 export const authChecker = async (req: any, res: any, next: any) => {
-  const authToken = req.headers["authorization"]?.split(" ")[1]; // Bearer token
+  const authToken = req.cookies.token;
 
   if (!authToken) {
     return res.status(403).json({ message: "Not Authenticated" });
@@ -10,9 +11,22 @@ export const authChecker = async (req: any, res: any, next: any) => {
 
   try {
     const decodedData = jwt.verify(authToken, process.env.JWT_SECRET as string);
-    req.user = decodedData;
+    if (!decodedData) {
+      return res.status(500).json({ message: "Failed to decode user Token" });
+    }
+
+    const dbUser = await User.findById(decodedData.id);
+
+    if (!dbUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const filteredUser = dbUser.toObject();
+    delete filteredUser.password;
+    req.user = filteredUser;
     next();
   } catch (error) {
-    return res.status(403).json({ message: "Invalid Token" });
+    console.log(error);
+
+    return res.status(403).json({ message: "Internal Server Error" });
   }
 };

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { Role } from "../models/role.model";
-import { Permission } from "../models/permission.model";
-import { User } from "../models/user.model";
+import { Role } from "../models/roleModel";
+import { Permission } from "../models/permissionModel";
+import { User } from "../models/userModel";
 
 export const createRole = async (req: Request, res: Response) => {
   const { name, permissions } = req.body;

@@ -4,7 +4,7 @@ import {
   deleteRole,
   updateRole,
 } from "../controllers/roleController";
-import { checkPermission } from "../middlewares/checkPermission.middleware";
+import { checkPermission } from "../middlewares/checkPermission";
 
 const Router = express.Router();
 
