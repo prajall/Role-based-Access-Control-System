@@ -72,7 +72,7 @@ const RolePermissionsForm = ({ role }) => {
                     <td key={action}>
                       <input
                         type="checkbox"
-                        checked={isChecked}
+                        defaultChecked={isChecked}
                         onChange={(e) =>
                           handlePermissionChange(moduleName, action)
                         }

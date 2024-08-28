@@ -21,16 +21,19 @@ export const getAllRoles = async (req: Request, res: Response) => {
 };
 
 export const createRole = async (req: Request, res: Response) => {
-  const { name, permissions } = req.body;
+  const { name } = req.body;
 
-  if (!name || !Array.isArray(permissions)) {
-    return res
-      .status(400)
-      .json({ message: "Name and Permissions are required" });
+  if (!name) {
+    return res.status(400).json({ message: "Name is required" });
   }
 
   try {
-    const newRole = await Role.create({ name, permissions });
+    const duplicateData = await Role.findOne({ name });
+    if (duplicateData) {
+      return res.status(409).json({ message: `Role:${name} already Exists` });
+    }
+
+    const newRole = await Role.create({ name, permissions: [] });
     return res.status(201).json(newRole);
   } catch (error) {
     return res.status(500).json({ message: "Error creating role", error });
@@ -70,25 +73,21 @@ export const updateRole = async (req: Request, res: Response) => {
   }
 
   try {
-    const role = await Role.findById(roleId);
-    if (!role) {
+    const roleDoc = await Role.findById(roleId);
+    if (!roleDoc) {
       return res.status(404).json({ message: "Role not found" });
     }
 
-    const validPermissions = await Permission.find({
-      _id: { $in: permissions },
+    roleDoc.permissions.splice(0, roleDoc.permissions.length);
+
+    permissions.forEach((permission) => {
+      roleDoc.permissions.push(permission);
     });
 
-    if (validPermissions.length !== permissions.length) {
-      return res.status(400).json({ message: "Some permissions are invalid" });
-    }
-
-    role.permissions = permissions;
-    await role.save();
-
+    roleDoc.save();
     return res
       .status(200)
-      .json({ message: "Permissions updated successfully", role });
+      .json({ message: "Permissions updated successfully", roleDoc });
   } catch (error) {
     return res
       .status(500)

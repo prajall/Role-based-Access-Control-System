@@ -16,13 +16,13 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       required: true,
-      default: "user",
+      default: "User",
     },
     roleId: {
       type: Schema.Types.ObjectId,
       ref: "Role",
       required: true,
-      default: new mongoose.Types.ObjectId("66cd844ccca894647897f4b1"),
+      default: new mongoose.Types.ObjectId("66cf1685fbfb379ffe2b8703"),
     },
   },
   { timestamps: true }

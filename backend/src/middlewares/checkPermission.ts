@@ -13,22 +13,20 @@ export const checkPermission = (module: string, action: string) => {
           .json({ message: "Access Denied: No Role Found" });
       }
 
-      const userPermissions = await Role.findById(userRole).populate(
-        "permissions"
-      );
-      console.log(userPermissions);
+      const roleDoc = await Role.findById(userRole);
 
-      if (!userPermissions) {
-        return res
-          .status(403)
-          .json({ message: "Access Denied: Role not found" });
+      if (!roleDoc) {
+        return res.status(403).json({ message: "User's Role not found" });
+      }
+      if (roleDoc.name === "master" || roleDoc.name === "Master") {
+        next();
       }
 
-      const hasPermission = userPermissions.permissions.some(
-        (permission: any) => {
-          return permission.module === module && permission.action === action;
-        }
-      );
+      const hasPermission = roleDoc.permissions.some((permission: any) => {
+        return (
+          permission.module === module && permission.actions.includes(action)
+        );
+      });
 
       if (!hasPermission) {
         return res.status(403).json({
