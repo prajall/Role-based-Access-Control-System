@@ -3,6 +3,23 @@ import { Role } from "../models/roleModel";
 import { Permission } from "../models/permissionModel";
 import { User } from "../models/userModel";
 
+export const getAllRoles = async (req: Request, res: Response) => {
+  try {
+    const roles = await Role.find({ name: { $ne: "Master" } }).sort({
+      permissions: -1,
+    });
+
+    if (!roles || roles.length === 0) {
+      return res.status(404).json({ message: "No roles found" });
+    }
+
+    res.status(200).json(roles);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export const createRole = async (req: Request, res: Response) => {
   const { name, permissions } = req.body;
 
@@ -13,16 +30,8 @@ export const createRole = async (req: Request, res: Response) => {
   }
 
   try {
-    const validPermissions = await Permission.find({
-      _id: { $in: permissions },
-    });
-    if (validPermissions.length !== permissions.length) {
-      return res.status(400).json({ message: "Some permissions are invalid" });
-    }
-
-    const newRole = new Role({ name, permissions });
-    await newRole.save();
-    return res.status(201).json({ newRole });
+    const newRole = await Role.create({ name, permissions });
+    return res.status(201).json(newRole);
   } catch (error) {
     return res.status(500).json({ message: "Error creating role", error });
   }
@@ -32,14 +41,11 @@ export const deleteRole = async (req: Request, res: Response) => {
   const { roleId } = req.params;
 
   try {
-    // Check if the role exists
     const role = await Role.findById(roleId);
     console.log(roleId);
     if (!role) {
       return res.status(404).json({ message: "Role not found" });
     }
-
-    // Check if any users are associated with this role
     const isUserAssociated = await User.exists({ role: roleId });
     if (isUserAssociated) {
       return res.status(400).json({
@@ -47,7 +53,6 @@ export const deleteRole = async (req: Request, res: Response) => {
       });
     }
 
-    // Delete the role
     await Role.findByIdAndDelete(roleId);
 
     return res.status(200).json({ message: "Role deleted successfully" });
@@ -65,13 +70,11 @@ export const updateRole = async (req: Request, res: Response) => {
   }
 
   try {
-    // Check if the role exists
     const role = await Role.findById(roleId);
     if (!role) {
       return res.status(404).json({ message: "Role not found" });
     }
 
-    // Check if all provided permission IDs are valid
     const validPermissions = await Permission.find({
       _id: { $in: permissions },
     });
@@ -80,7 +83,6 @@ export const updateRole = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Some permissions are invalid" });
     }
 
-    // Update the role's permissions
     role.permissions = permissions;
     await role.save();
 

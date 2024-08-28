@@ -12,7 +12,7 @@ export default app;
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: "*",
     methods: "*",
     credentials: true,
   })

@@ -12,8 +12,6 @@ const generateToken = (id: string) => {
   });
 };
 
-//signup
-
 export const signupUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
@@ -46,7 +44,6 @@ export const signupUser = async (req: Request, res: Response) => {
   }
 };
 
-// Login user
 export const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
