@@ -117,7 +117,7 @@ const Login = () => {
           <Button
             variant="default"
             type="submit"
-            className="mt-4 bg-primary text-white py-3 rounded-lg disabled:opacity-80"
+            className="mt-4 bg-teal-600 hover:bg-teal-500 text-white py-3 rounded-lg disabled:opacity-80"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Logging in" : "Login"}

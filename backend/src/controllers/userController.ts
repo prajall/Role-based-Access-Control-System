@@ -6,10 +6,32 @@ import { create } from "domain";
 import { Role } from "../models/roleModel";
 
 // Generate JWT token
-const generateToken = (id: string) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET as string, {
-    expiresIn: "30d",
-  });
+const generateToken = (id: any) => {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    throw new Error("Jwt secret is not available");
+  }
+
+  const token = jwt.sign({ id }, secret);
+  return token;
+};
+const verifyToken = (token: any) => {
+  try {
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret) {
+      throw new Error("Jwt secret is not available");
+    }
+    const verified = jwt.verify(token, secret);
+    return verified;
+  } catch (err: any) {
+    console.log("Invalid Token");
+    if (err.message) {
+      console.log(err.message);
+    }
+    return false;
+  }
 };
 
 export const signupUser = async (req: Request, res: Response) => {
@@ -91,6 +113,20 @@ export const deleteUser = async (req: Request, res: Response) => {
     return res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
+
+export const getUserInfo = async (req: Request, res: Response) => {
+  const user = req.user;
+  try {
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json(user);
+  } catch (err: any) {
+    console.error("Error fetching user info: ", err);
+    return res.status(400).json({ message: err.message });
   }
 };
 
