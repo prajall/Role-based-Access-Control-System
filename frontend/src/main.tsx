@@ -23,8 +23,11 @@ createRoot(document.getElementById("root")!).render(
         theme="light"
         transition={Slide}
       />
+
       <AppProvider>
-        <App />
+        <div className="roboto-regular">
+          <App />
+        </div>
       </AppProvider>
     </BrowserRouter>
   </StrictMode>

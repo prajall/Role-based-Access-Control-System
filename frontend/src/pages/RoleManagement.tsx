@@ -19,6 +19,7 @@ import {
   DialogFooter,
 } from "../components/ui/dialog";
 import { Input } from "../components/ui/input";
+import Header from "../components/Header";
 
 const RoleManagement = () => {
   const [isFetching, setIsFetching] = useState(false);
@@ -81,10 +82,18 @@ const RoleManagement = () => {
 
   return (
     <div>
-      <h3 className="text-2xl font-semibold mb-4">Manage Roles</h3>
+      <Header
+        title="Role Management"
+        description="Manage Roles and Permissions each role can have"
+      />
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button onClick={() => setIsDialogOpen(true)}>Add Role</Button>
+          <Button
+            className="bg-teal-600 text-white"
+            onClick={() => setIsDialogOpen(true)}
+          >
+            Add Role
+          </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
@@ -97,22 +106,30 @@ const RoleManagement = () => {
               onChange={(e) => setRoleName(e.target.value)}
               className="w-full"
             />
+            <p className="text-muted-foreground my-2 text-xs">
+              You can manage access to this role from role management
+            </p>
           </div>
           <DialogFooter>
-            <Button onClick={handleAddRole}>Add Role</Button>
+            <Button
+              className="bg-teal-600 hover:bg-teal-500"
+              onClick={handleAddRole}
+            >
+              Add Role
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {isFetching && <p>Loading Roles...</p>}
 
-      <Accordion type="single" collapsible className="max-w-96 mt-4">
+      <Accordion type="single" collapsible className="min-w-96 w-full mt-4">
         {roles.map((role) => (
           <AccordionItem value={role._id} key={role._id}>
-            <AccordionTrigger className="hover:no-underline bg-zinc-100 rounded-md px-4 ">
+            <AccordionTrigger className="hover:no-underline bg-zinc-50 rounded-md px-4 ">
               {role.name}
             </AccordionTrigger>
-            <AccordionContent className="bg-zinc-50 rounded-md px-4">
+            <AccordionContent className="rounded-md px-4">
               <ModulePermissions role={role} />
             </AccordionContent>
           </AccordionItem>

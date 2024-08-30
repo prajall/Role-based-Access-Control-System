@@ -8,11 +8,13 @@ function App() {
   return (
     <>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/roles" element={<RoleManagement />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
+      <div className="px-4 sm:px-10 lg:px-20">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/roles" element={<RoleManagement />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </div>
     </>
   );
 }

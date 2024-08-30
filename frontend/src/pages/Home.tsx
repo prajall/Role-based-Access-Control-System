@@ -1,7 +1,7 @@
-import { Button, buttonVariants } from "../components/ui/button";
-import { AppContext } from "../contexts/Appcontext";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { Button } from "../components/ui/button";
+import { AppContext } from "../contexts/Appcontext";
 
 const Home = () => {
   const { appData, isLoadingAppData } = useContext(AppContext);
@@ -37,12 +37,14 @@ const Home = () => {
           >
             Manage Users
           </Button>
-          <Button
-            variant={"outline"}
-            className=" border border-emerald-500 text-emerald-500 hover:text-emerald-500 hover:bg-emerald-50"
-          >
-            Roles & Permissions
-          </Button>
+          <Link to="/roles">
+            <Button
+              variant={"outline"}
+              className=" border border-emerald-500 text-emerald-500 hover:text-emerald-500 hover:bg-emerald-50"
+            >
+              Roles & Permissions
+            </Button>
+          </Link>
         </div>
       )}
     </div>

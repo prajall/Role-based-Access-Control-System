@@ -1,8 +1,16 @@
 import { RoleProp } from "@/types";
-import { useEffect, useState } from "react";
-import { Button } from "./ui/button";
 import axios from "axios";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../components/ui/table";
+import { Button } from "./ui/button";
 
 const ModulePermissions = ({ role }: { role: RoleProp }) => {
   const modules = ["Customer", "Employee", "Product", "Orders", "Billing"];
@@ -15,7 +23,6 @@ const ModulePermissions = ({ role }: { role: RoleProp }) => {
     module: string,
     action: string
   ) => {
-    // Create a copy of updatedRole to maintain immutability
     const newUpdatedRole = { ...updatedRole };
 
     const modulePermission = newUpdatedRole.permissions.find(
@@ -70,41 +77,57 @@ const ModulePermissions = ({ role }: { role: RoleProp }) => {
   }, [role]);
 
   return (
-    <div>
-      {modules.map((module, index) => {
-        const modulePermission = updatedRole.permissions.find(
-          (permission) => permission.module === module
-        );
-        return (
-          <div key={index}>
-            <table>
-              <tbody>
-                <tr>
-                  <td>{module}</td>
-                  {actions.map((action) => {
-                    const isChecked = modulePermission
-                      ? modulePermission.actions.includes(action)
-                      : false;
+    <div className="flex flex-col items-end">
+      <Table>
+        <TableHeader className="">
+          <TableRow className="text-md">
+            <TableHead className="w-[100px]">Module</TableHead>
+            {actions.map((action) => (
+              <TableHead className="text-center">
+                {action.charAt(0).toUpperCase() + action.slice(1)}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody className="">
+          {modules.map((module) => {
+            const modulePermission = updatedRole.permissions.find(
+              (permission) => permission.module === module
+            );
+            return (
+              <TableRow>
+                <TableCell className="font-medium md:w-1/2 ">
+                  <p className="pl-2 opacity-80">{module}</p>
+                </TableCell>
+                {actions.map((action) => {
+                  const isChecked = modulePermission
+                    ? modulePermission.actions.includes(action)
+                    : false;
 
-                    return (
-                      <td key={action}>
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={(e) =>
-                            handlePermissionChange(e, module, action)
-                          }
-                        />
-                      </td>
-                    );
-                  })}
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        );
-      })}
-      <Button onClick={updateRole}>Save</Button>
+                  return (
+                    <TableCell className="text-center">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) =>
+                          handlePermissionChange(e, module, action)
+                        }
+                      />
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+
+      <Button
+        onClick={updateRole}
+        className="border bg-teal-600 hover:bg-teal-500 border-teal-600 text-white px-6"
+      >
+        Save
+      </Button>
     </div>
   );
 };
