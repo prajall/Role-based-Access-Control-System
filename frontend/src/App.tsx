@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import RoleManagement from "./pages/RoleManagement";
 import Login from "./pages/Login";
 import Navbar from "./components/Navbar";
+import ManageUsers from "./pages/ManageUsers";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/roles" element={<RoleManagement />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/manage-users" element={<ManageUsers />} />
         </Routes>
       </div>
     </>

@@ -7,13 +7,13 @@ const Home = () => {
   const { appData, isLoadingAppData } = useContext(AppContext);
   return (
     <div className="min-h-[80vh] flex flex-col justify-center">
-      <p className="text-center text-teal-950 text-5xl font-bold max-w-[600px] mx-auto ">
+      <p className="text-center text-teal-950 text-5xl font-bold max-w-[850px] mx-auto ">
         Role Based Access Control System
       </p>
 
       <p className="text-center text-xl text-gray-600 max-w-[600px] mx-auto mt-6 ">
-        This system helps you to manage your staffs and assign various roles and
-        permissions they can access.
+        This is a demo of a system that lets you manage your staffs and assign
+        various roles and permissions.
       </p>
       {!appData.user && !isLoadingAppData && (
         <Link
@@ -31,12 +31,14 @@ const Home = () => {
           >
             View Products
           </Button>
-          <Button
-            variant={"outline"}
-            className=" border border-blue-500 text-blue-500 hover:text-blue-500 hover:bg-blue-50"
-          >
-            Manage Users
-          </Button>
+          <Link to="/manage-users">
+            <Button
+              variant={"outline"}
+              className=" border border-blue-500 text-blue-500 hover:text-blue-500 hover:bg-blue-50"
+            >
+              Manage Users
+            </Button>
+          </Link>
           <Link to="/roles">
             <Button
               variant={"outline"}

@@ -130,6 +130,30 @@ export const getUserInfo = async (req: Request, res: Response) => {
   }
 };
 
+export const getAllUsers = async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const sortField: string = req.query.sortField?.toString() || "email";
+  const sortOrder = req.query.sortOrder === "desc" ? -1 : 1;
+
+  const startIndex = (page - 1) * limit;
+
+  try {
+    const totalUsers = await User.countDocuments();
+    const users = await User.find()
+      .sort({ [sortField]: sortOrder })
+      .skip(startIndex)
+      .limit(limit);
+
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    return res.status(200).json(users);
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    return res.status(500).json({ message: "Failed to fetch users" });
+  }
+};
+
 export const updateUserRole = async (req: Request, res: Response) => {
   const { newRole } = req.body;
   const userIdToUpdate = req.params.userId;
@@ -141,7 +165,9 @@ export const updateUserRole = async (req: Request, res: Response) => {
     if (!user) {
       return res.status(404).json({ message: "Please Login" });
     }
+
     const newRoleDocs = await Role.findOne({ name: newRole });
+
     if (!newRoleDocs) {
       return res.status(400).json({ message: "Invalid role specified" });
     }
@@ -165,9 +191,7 @@ export const updateUserRole = async (req: Request, res: Response) => {
 
     await userDoc.save();
 
-    return res
-      .status(200)
-      .json({ message: "User role updated successfully", userDoc });
+    return res.status(200).json(userDoc);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal Server Error", error });

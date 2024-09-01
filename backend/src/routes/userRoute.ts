@@ -1,6 +1,7 @@
 import express from "express";
 import {
   deleteUser,
+  getAllUsers,
   getUserInfo,
   loginUser,
   signupUser,
@@ -8,9 +9,11 @@ import {
 } from "../controllers/userController";
 import { authChecker } from "../middlewares/authChecker";
 import { adminChecker, checkPermission } from "../middlewares/checkPermission";
+import { getAllRoles } from "../controllers/roleController";
 
 const router = express.Router();
 
+router.get("/", authChecker, adminChecker, getAllUsers);
 router.post("/login", loginUser);
 router.post("/signup", signupUser);
 router.get("/loggedin-user", authChecker, getUserInfo);

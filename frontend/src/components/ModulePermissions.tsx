@@ -81,9 +81,11 @@ const ModulePermissions = ({ role }: { role: RoleProp }) => {
       <Table>
         <TableHeader className="">
           <TableRow className="text-md">
-            <TableHead className="w-[100px]">Module</TableHead>
+            <TableHead className="w-[100px] text-center text-teal-800 ">
+              Module
+            </TableHead>
             {actions.map((action) => (
-              <TableHead className="text-center">
+              <TableHead className="text-center  text-teal-800 ">
                 {action.charAt(0).toUpperCase() + action.slice(1)}
               </TableHead>
             ))}
