@@ -13,16 +13,28 @@ import { getAllRoles } from "../controllers/roleController";
 
 const router = express.Router();
 
-router.get("/", authChecker, adminChecker, getAllUsers);
 router.post("/login", loginUser);
 router.post("/signup", signupUser);
-router.get("/loggedin-user", authChecker, getUserInfo);
-router.patch("/role/:userId", authChecker, adminChecker, updateUserRole);
+router.get("/", authChecker, checkPermission("User", "View"), getAllUsers);
+router.get(
+  "/loggedin-user",
+  authChecker,
+  checkPermission("User", "View"),
+  getUserInfo
+);
+router.patch(
+  "/role/:userId",
+  authChecker,
+  // adminChecker,
+  checkPermission("User", "Edit"),
+  updateUserRole
+);
 router.delete(
   "/:userId",
   authChecker,
-  checkPermission("user", "delete"),
-  (req, res) => res.send("Permission Granted")
+  adminChecker,
+  checkPermission("User", "Delete"),
+  deleteUser
 );
 
 export default router;

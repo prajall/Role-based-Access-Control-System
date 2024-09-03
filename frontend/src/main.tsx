@@ -22,6 +22,7 @@ createRoot(document.getElementById("root")!).render(
         pauseOnHover
         theme="light"
         transition={Slide}
+        style={{ width: 380 }}
       />
 
       <AppProvider>

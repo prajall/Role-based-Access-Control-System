@@ -1,6 +1,23 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { toast } from "react-toastify";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -8,31 +25,20 @@ import {
   TableHead,
   TableRow,
 } from "@/components/ui/table";
-import { UserProp } from "@/types";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { RoleProp, UserProp } from "@/types";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState<UserProp[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserProp | null>(null);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
   const [sortField, setSortField] = useState<string>("role");
-  const [sortOrder, setSortOrder] = useState<string>("asc");
-  const roles = ["User", "Employee", "Admin"];
+  const [sortOrder] = useState<string>("dsc");
+  const [roles, setRoles] = useState<RoleProp[]>([]);
 
   const fetchUsers = async () => {
     try {
@@ -55,10 +61,25 @@ const ManageUsers = () => {
       console.error("Failed to fetch users:", error);
     }
   };
+  const fetchRoles = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/role`, {
+        withCredentials: true,
+      });
+      console.log(response);
+      if (response.status === 200) setRoles(response.data);
+    } catch (error: any) {
+      if (error.response?.data?.message)
+        toast.error(error.response?.data?.message);
+      else {
+        toast.error("Failed to fetch users.");
+      }
+      console.error("Failed to fetch users:", error);
+    }
+  };
 
   const handleSortChange = (field: string) => {
     setSortField(field);
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
 
   const handleConfirmRoleChange = async () => {
@@ -68,6 +89,9 @@ const ManageUsers = () => {
           `${import.meta.env.VITE_API_URL}/user/role/${selectedUser._id}`,
           {
             newRole: selectedRole,
+          },
+          {
+            withCredentials: true,
           }
         );
         setUsers((prevUsers) =>
@@ -78,6 +102,7 @@ const ManageUsers = () => {
           )
         );
         toast.success("Role updated successfully!");
+        fetchUsers();
       } catch (error: any) {
         if (error.response?.data?.message)
           toast.error(error.response?.data?.message);
@@ -91,6 +116,35 @@ const ManageUsers = () => {
     }
   };
 
+  const handleDeleteUser = async () => {
+    console.log("Delete user");
+    if (selectedUser) {
+      try {
+        const response = await axios.delete(
+          `${import.meta.env.VITE_API_URL}/user/${selectedUser._id}`,
+
+          {
+            withCredentials: true,
+          }
+        );
+        console.log(response);
+        if (response.status === 200) {
+          toast.success("User Deleted Successfully!");
+          fetchUsers();
+        }
+      } catch (error: any) {
+        if (error.response?.data?.message)
+          toast.error(error.response?.data?.message);
+        else {
+          toast.error("Failed to Delete User.");
+        }
+        console.error("Failed to Delete User:", error);
+      } finally {
+        setOpenDeleteDialog(false);
+      }
+    }
+  };
+
   const openRoleChangeDialog = (user: UserProp, role: string) => {
     setSelectedUser(user);
     setSelectedRole(role);
@@ -100,6 +154,10 @@ const ManageUsers = () => {
   useEffect(() => {
     fetchUsers();
   }, [sortField]);
+
+  useEffect(() => {
+    fetchRoles();
+  }, []);
 
   return (
     <div className="p-6">
@@ -120,7 +178,7 @@ const ManageUsers = () => {
         <TableRow>
           <TableHead>Email</TableHead>
           <TableHead>Role</TableHead>
-          <TableHead>Actions</TableHead>
+          <TableHead className="text-center">Actions</TableHead>
         </TableRow>
         <TableBody>
           {users.map((user) => (
@@ -137,15 +195,31 @@ const ManageUsers = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {roles.map((role) => (
-                      <SelectItem key={role} value={role}>
-                        {role}
+                      <SelectItem key={role._id} value={role.name}>
+                        {role.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </TableCell>
-              <TableCell>
-                <Button className="bg-teal-600 text-white">Edit</Button>
+              <TableCell className="flex justify-center">
+                {/* <Button className="bg-teal-600 text-white">Edit</Button> */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <p className="font-semibold text-center">...</p>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      className="text-red-400 text-xs h-6"
+                      onClick={() => {
+                        setSelectedUser(user);
+                        setOpenDeleteDialog(true);
+                      }}
+                    >
+                      Delete User
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TableCell>
             </TableRow>
           ))}
@@ -170,6 +244,26 @@ const ManageUsers = () => {
               className="bg-teal-600 text-white"
             >
               Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+        <DialogContent>
+          <DialogTitle>Confirm Delete User</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete this user ?
+          </DialogDescription>
+          <DialogFooter>
+            <Button onClick={() => setOpenDialog(false)} variant="secondary">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteUser}
+              variant="default"
+              className="bg-red-600 text-white"
+            >
+              Delete yes
             </Button>
           </DialogFooter>
         </DialogContent>

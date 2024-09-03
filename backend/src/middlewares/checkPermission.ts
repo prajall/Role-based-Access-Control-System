@@ -5,7 +5,8 @@ import { User } from "../models/userModel";
 export const checkPermission = (module: string, action: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userRole = req.user?.role;
+      console.log("Check Permission: ", module, action);
+      const userRole = req.user?.roleId.toString();
 
       if (!userRole) {
         return res
@@ -16,10 +17,12 @@ export const checkPermission = (module: string, action: string) => {
       const roleDoc = await Role.findById(userRole);
 
       if (!roleDoc) {
+        console.log("no role doc");
         return res.status(403).json({ message: "User's Role not found" });
       }
-      if (roleDoc.name === "master" || roleDoc.name === "Master") {
+      if (roleDoc.name === "Master") {
         next();
+        return;
       }
 
       const hasPermission = roleDoc.permissions.some((permission: any) => {
@@ -36,6 +39,7 @@ export const checkPermission = (module: string, action: string) => {
       }
       next();
     } catch (error) {
+      console.log(error);
       return res.status(500).json({ message: "Internal Server Error" });
     }
   };
@@ -60,10 +64,10 @@ export const adminChecker = async (
       return res.status(403).json({ message: "User not found" });
     }
     console.log(userDoc);
-    if (userDoc.role != "admin" && userDoc.role != "master") {
+    if (userDoc.role != "Admin" && userDoc.role != "Master") {
       return res.status(403).json({ message: "Access Denied: Admins only" });
     }
-
+    console.log("Next Admin Checker");
     next();
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error", error });
@@ -88,7 +92,7 @@ export const masterChecker = async (
       return res.status(403).json({ message: "User not found" });
     }
 
-    if (userDoc.role !== "master") {
+    if (userDoc.role !== "Master") {
       return res
         .status(403)
         .json({ message: 'Forbidden. Only for "Master" role' });

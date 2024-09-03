@@ -1,13 +1,15 @@
 "use client";
+import { AppContext } from "@/contexts/Appcontext";
 import { Button } from "../components/ui/button";
 import axios from "axios";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { appData, setAppData } = useContext(AppContext);
 
   const {
     register,
@@ -30,6 +32,7 @@ const Login = () => {
         { withCredentials: true }
       );
       if (response.status >= 200) {
+        setAppData(response.data);
         toast.success("Logged in successfully");
         navigate("/");
       } else {

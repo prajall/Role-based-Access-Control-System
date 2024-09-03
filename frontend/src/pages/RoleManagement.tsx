@@ -30,7 +30,9 @@ const RoleManagement = () => {
   const fetchRoles = async () => {
     setIsFetching(true);
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/role`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/role`, {
+        withCredentials: true,
+      });
       if (response.status === 200) {
         setRoles(response.data);
       } else {
@@ -59,6 +61,9 @@ const RoleManagement = () => {
         `${import.meta.env.VITE_API_URL}/role/new-role`,
         {
           name: roleName,
+        },
+        {
+          withCredentials: true,
         }
       );
 
@@ -78,6 +83,23 @@ const RoleManagement = () => {
 
   useEffect(() => {
     fetchRoles();
+
+    const eventSource = new EventSource(
+      `${import.meta.env.VITE_API_URL}/role/sse`
+    );
+
+    eventSource.onmessage = (event) => {
+      console.log("roles updated", event.data);
+      setRoles(JSON.parse(event.data));
+    };
+    eventSource.onerror = (error) => {
+      console.error("Role SSE error:", error);
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
   }, []);
 
   return (

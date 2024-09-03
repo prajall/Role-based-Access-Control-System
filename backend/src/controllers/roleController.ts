@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Role } from "../models/roleModel";
 import { Permission } from "../models/permissionModel";
 import { User } from "../models/userModel";
+import { sendUpdatedRole } from "../routes/roleRoute";
 
 export const getAllRoles = async (req: Request, res: Response) => {
   try {
@@ -34,6 +35,12 @@ export const createRole = async (req: Request, res: Response) => {
     }
 
     const newRole = await Role.create({ name, permissions: [] });
+    const roleDoc = await Role.find({ name: { $ne: "Master" } }).sort({
+      permissions: -1,
+    });
+    if (roleDoc) {
+      sendUpdatedRole(roleDoc);
+    }
     return res.status(201).json(newRole);
   } catch (error) {
     return res.status(500).json({ message: "Error creating role", error });
@@ -42,6 +49,7 @@ export const createRole = async (req: Request, res: Response) => {
 
 export const deleteRole = async (req: Request, res: Response) => {
   const { roleId } = req.params;
+  const user = req.user;
 
   try {
     const role = await Role.findById(roleId);
@@ -49,14 +57,29 @@ export const deleteRole = async (req: Request, res: Response) => {
     if (!role) {
       return res.status(404).json({ message: "Role not found" });
     }
-    const isUserAssociated = await User.exists({ role: roleId });
-    if (isUserAssociated) {
+
+    if (role.name === "Admin" && user.role != "Master") {
+      return res
+        .status(403)
+        .json({ message: "Only Master can Delete Admin Roles" });
+    }
+
+    const isUserAssociated = await User.find({ roleId });
+    console.log("Is user associated:", isUserAssociated);
+    if (isUserAssociated.length > 0) {
       return res.status(400).json({
-        message: "Cannot delete role, users are associated with this role",
+        message: "Cannot delete role, Users are associated with this role",
       });
     }
 
-    await Role.findByIdAndDelete(roleId);
+    const response = await Role.findByIdAndDelete(roleId);
+    console.log(response);
+    const roleDoc = await Role.find({ name: { $ne: "Master" } }).sort({
+      permissions: -1,
+    });
+    if (roleDoc) {
+      sendUpdatedRole(roleDoc);
+    }
 
     return res.status(200).json({ message: "Role deleted successfully" });
   } catch (error) {
@@ -85,10 +108,20 @@ export const updateRole = async (req: Request, res: Response) => {
     });
 
     roleDoc.save();
+
+    const updatedRoleDoc = await Role.find({ name: { $ne: "Master" } }).sort({
+      permissions: -1,
+    });
+    if (updatedRoleDoc) {
+      console.log("Sending");
+      sendUpdatedRole(updatedRoleDoc);
+    }
+
     return res
       .status(200)
       .json({ message: "Permissions updated successfully", roleDoc });
   } catch (error) {
+    console.log(error);
     return res
       .status(500)
       .json({ message: "Error updating permissions", error });

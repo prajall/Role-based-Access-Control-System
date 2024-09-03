@@ -13,8 +13,8 @@ import {
 import { Button } from "./ui/button";
 
 const ModulePermissions = ({ role }: { role: RoleProp }) => {
-  const modules = ["Customer", "Employee", "Product", "Orders", "Billing"];
-  const actions = ["view", "add", "update", "delete"];
+  const modules = ["Customer", "Product", "Orders", "Billing", "User"];
+  const actions = ["View", "Add", "Edit", "Delete"];
 
   const [updatedRole, setUpdatedRole] = useState({ ...role });
 
@@ -63,6 +63,23 @@ const ModulePermissions = ({ role }: { role: RoleProp }) => {
       console.log(response);
       if (response.status === 200) {
         toast.success(response.data.message);
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (error.response?.data) {
+        toast.error(error.response?.data.message);
+      }
+    }
+  };
+
+  const deleteRole = async () => {
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/role/${role._id}`,
+        { withCredentials: true }
+      );
+      if (response.status === 200) {
+        toast.success("Role deleted successfully");
       }
     } catch (error: any) {
       console.log(error);
@@ -123,13 +140,21 @@ const ModulePermissions = ({ role }: { role: RoleProp }) => {
           })}
         </TableBody>
       </Table>
-
-      <Button
-        onClick={updateRole}
-        className="border bg-teal-600 hover:bg-teal-500 border-teal-600 text-white px-6"
-      >
-        Save
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          onClick={deleteRole}
+          variant={"link"}
+          className=" text-red-600 px-6"
+        >
+          Delete
+        </Button>
+        <Button
+          onClick={updateRole}
+          className="border bg-teal-600 hover:bg-teal-500 border-teal-600 text-white px-6"
+        >
+          Save
+        </Button>
+      </div>
     </div>
   );
 };

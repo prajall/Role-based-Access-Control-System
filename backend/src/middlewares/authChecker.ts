@@ -4,6 +4,7 @@ import { User } from "../models/userModel";
 
 export const authChecker = async (req: any, res: any, next: any) => {
   const authToken = req.cookies.token;
+  console.log("Auth Token:", authToken);
 
   if (!authToken) {
     return res.status(403).json({ message: "Please Login" });
