@@ -139,9 +139,12 @@ export const updateRole = async (req: Request, res: Response) => {
 
     roleDoc.save();
 
-    const updatedRoleDoc = await Role.find({ name: { $ne: "Master" } }).sort({
+    let updatedRoleDoc = await Role.find({ name: { $ne: "Master" } }).sort({
       permissions: -1,
     });
+    if (user.role != "Master") {
+      updatedRoleDoc = updatedRoleDoc.filter((role) => role.name != "Admin");
+    }
     if (updatedRoleDoc) {
       console.log("Sending");
       sendUpdatedRole(updatedRoleDoc);

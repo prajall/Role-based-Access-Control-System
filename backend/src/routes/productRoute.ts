@@ -11,15 +11,15 @@ import { checkPermission } from "../middlewares/checkPermission";
 
 const Router = express.Router();
 
-// Router.post("/", authChecker, checkPermission("Product", "Add"), createProduct);
-Router.post("/new", authChecker, createProduct);
+Router.post("/", authChecker, checkPermission("Product", "Add"), createProduct);
 Router.put(
   "/:productId",
   authChecker,
   checkPermission("product", "update"),
   updateProduct
 );
-Router.get("/", checkPermission("Product", "View"), viewAllProducts);
+// Router.get("/", checkPermission("Product", "View"), viewAllProducts);
+Router.get("/", viewAllProducts);
 Router.get("/:productId", checkPermission("Product", "View"), viewOneProduct);
 Router.delete(
   "/:productId",

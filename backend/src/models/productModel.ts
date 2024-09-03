@@ -20,6 +20,12 @@ const productSchema = new Schema({
     type: String,
     required: true,
   },
+  rating: {
+    type: {
+      rate: Number,
+      count: Number,
+    },
+  },
 });
 
 export const Product = mongoose.model("Product", productSchema);

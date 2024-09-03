@@ -25,12 +25,14 @@ const Home = () => {
       )}
       {appData.user && (
         <div className="flex justify-center gap-3 mt-6">
-          <Button
-            variant={"outline"}
-            className=" border border-orange-500 text-orange-500 hover:text-orange-500 hover:bg-orange-50"
-          >
-            View Products
-          </Button>
+          <Link to={"/manage-products"}>
+            <Button
+              variant={"outline"}
+              className=" border border-orange-500 text-orange-500 hover:text-orange-500 hover:bg-orange-50"
+            >
+              View Products
+            </Button>
+          </Link>
           <Link to="/manage-users">
             <Button
               variant={"outline"}

@@ -84,7 +84,7 @@ const Login = () => {
             />
             {errors.email && (
               <p className="text-red-600 text-sm mt-1 mb-1">
-                {errors.email.message}
+                {errors.email.message?.toString()}
               </p>
             )}
           </div>
@@ -104,7 +104,7 @@ const Login = () => {
             />
             {errors.password && (
               <p className="text-red-600 text-sm mt-1 ">
-                {errors.password.message}
+                {errors.password.message?.toString()}
               </p>
             )}
           </div>
