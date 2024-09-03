@@ -11,7 +11,8 @@ import { checkPermission } from "../middlewares/checkPermission";
 
 const Router = express.Router();
 
-Router.post("/", authChecker, checkPermission("Product", "Add"), createProduct);
+// Router.post("/", authChecker, checkPermission("Product", "Add"), createProduct);
+Router.post("/new", authChecker, createProduct);
 Router.put(
   "/:productId",
   authChecker,

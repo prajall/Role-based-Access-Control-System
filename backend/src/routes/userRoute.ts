@@ -15,7 +15,13 @@ const router = express.Router();
 
 router.post("/login", loginUser);
 router.post("/signup", signupUser);
-router.get("/", authChecker, checkPermission("User", "View"), getAllUsers);
+router.get(
+  "/",
+  authChecker,
+  adminChecker,
+  checkPermission("User", "View"),
+  getAllUsers
+);
 router.get(
   "/loggedin-user",
   authChecker,

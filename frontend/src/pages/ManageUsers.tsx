@@ -63,9 +63,12 @@ const ManageUsers = () => {
   };
   const fetchRoles = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/role`, {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/role/wa`,
+        {
+          withCredentials: true,
+        }
+      );
       console.log(response);
       if (response.status === 200) setRoles(response.data);
     } catch (error: any) {

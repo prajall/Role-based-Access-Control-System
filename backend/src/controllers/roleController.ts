@@ -5,8 +5,30 @@ import { User } from "../models/userModel";
 import { sendUpdatedRole } from "../routes/roleRoute";
 
 export const getAllRoles = async (req: Request, res: Response) => {
+  const user = req.user;
+
   try {
-    const roles = await Role.find({ name: { $ne: "Master" } }).sort({
+    let roles = await Role.find({ name: { $ne: "Master" } }).sort({
+      permissions: -1,
+    });
+
+    if (!roles || roles.length === 0) {
+      return res.status(404).json({ message: "No roles found" });
+    }
+
+    if (user.role != "Master") {
+      roles = roles.filter((role) => role.name != "Admin");
+    }
+
+    res.status(200).json(roles);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+export const getAllRolesWithAdmin = async (req: Request, res: Response) => {
+  try {
+    let roles = await Role.find({ name: { $ne: "Master" } }).sort({
       permissions: -1,
     });
 
@@ -58,10 +80,13 @@ export const deleteRole = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Role not found" });
     }
 
-    if (role.name === "Admin" && user.role != "Master") {
+    if (role.name === "Admin" || user.role === "Master") {
       return res
         .status(403)
-        .json({ message: "Only Master can Delete Admin Roles" });
+        .json({ message: "Cannot Delete Admin and Master roles" });
+    }
+    if (role.name === "User") {
+      return res.status(403).json({ message: "Cannot Delete User role" });
     }
 
     const isUserAssociated = await User.find({ roleId });
@@ -90,6 +115,7 @@ export const deleteRole = async (req: Request, res: Response) => {
 export const updateRole = async (req: Request, res: Response) => {
   const { roleId } = req.params;
   const { permissions } = req.body;
+  const user = req.user;
 
   if (!Array.isArray(permissions)) {
     return res.status(400).json({ message: "Permissions should be an array" });
@@ -99,6 +125,10 @@ export const updateRole = async (req: Request, res: Response) => {
     const roleDoc = await Role.findById(roleId);
     if (!roleDoc) {
       return res.status(404).json({ message: "Role not found" });
+    }
+
+    if (roleDoc.name === "Admin" && user.role != "Master") {
+      return res.status(403).json({ message: "Only Master can modify Admin" });
     }
 
     roleDoc.permissions.splice(0, roleDoc.permissions.length);

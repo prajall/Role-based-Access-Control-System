@@ -102,7 +102,21 @@ export const loginUser = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
   const { userId } = req.params;
 
+  const user = req.user;
+
   try {
+    const userToDelete = await User.findById(userId);
+
+    if (!userToDelete) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (userToDelete.role === "Admin" && user.role !== "Master") {
+      return res
+        .status(403)
+        .json({ message: "Access Denied. Only Master can delete Admins" });
+    }
+
     // Find the user by ID and delete them
     const deletedUser = await User.findByIdAndDelete(userId);
 
