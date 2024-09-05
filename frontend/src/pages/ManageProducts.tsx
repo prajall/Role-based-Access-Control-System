@@ -34,9 +34,11 @@ const ManageProducts: React.FC = () => {
     <>
       <div className="flex justify-between md:gap-4 md:justify-start">
         <Header title="Products" description="Manage your Products " />
-        <Link to="/manage-products/new">
-          <Button>Add Product</Button>
-        </Link>
+        {
+          <Link to="/manage-products/new">
+            <Button>Add Product</Button>
+          </Link>
+        }
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
         {products.map((product) => (

@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { AppContext } from "../contexts/Appcontext";
+import { checkPermission } from "@/lib/utils";
 
 const Home = () => {
   const { appData, isLoadingAppData } = useContext(AppContext);
@@ -25,14 +26,17 @@ const Home = () => {
       )}
       {appData.user && (
         <div className="flex justify-center gap-3 mt-6">
-          <Link to={"/manage-products"}>
-            <Button
-              variant={"outline"}
-              className=" border border-orange-500 text-orange-500 hover:text-orange-500 hover:bg-orange-50"
-            >
-              View Products
-            </Button>
-          </Link>
+          <Button
+            variant={"outline"}
+            className=" border border-orange-500 text-orange-500 hover:text-orange-500 hover:bg-orange-50"
+            disabled={checkPermission(
+              appData?.userRole?.permissions,
+              "Product",
+              "View"
+            )}
+          >
+            <Link to={"/manage-products"}>View Products</Link>
+          </Button>
           <Link to="/manage-users">
             <Button
               variant={"outline"}

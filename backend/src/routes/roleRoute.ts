@@ -4,6 +4,7 @@ import {
   deleteRole,
   getAllRoles,
   getAllRolesWithAdmin,
+  getUserRole,
   updateRole,
 } from "../controllers/roleController";
 import { adminChecker, checkPermission } from "../middlewares/checkPermission";
@@ -12,6 +13,7 @@ import { authChecker } from "../middlewares/authChecker";
 const Router = express.Router();
 
 Router.get("/", authChecker, adminChecker, getAllRoles);
+Router.get("/user", authChecker, getUserRole);
 Router.get("/wa", authChecker, adminChecker, getAllRolesWithAdmin);
 Router.post("/new-role", authChecker, adminChecker, createRole);
 Router.delete("/:roleId", authChecker, adminChecker, deleteRole);

@@ -23,6 +23,7 @@ import {
   TableBody,
   TableCell,
   TableHead,
+  TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { RoleProp, UserProp } from "@/types";
@@ -167,22 +168,27 @@ const ManageUsers = () => {
       <h1 className="text-2xl font-semibold mb-4">Manage Users</h1>
       <div className="mb-4 items-center flex gap-2">
         <p className="text-xs">Sort By</p>
-        <Select onValueChange={(value) => handleSortChange(value)}>
+        <Select
+          value={sortField}
+          onValueChange={(value) => handleSortChange(value)}
+        >
           <SelectTrigger className="max-w-44">
             {sortField == "email" ? "Email" : "Role"}
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="email">Email</SelectItem>
             <SelectItem value="role">Role</SelectItem>
+            <SelectItem value="email">Email</SelectItem>
           </SelectContent>
         </Select>
       </div>
       <Table>
-        <TableRow>
-          <TableHead>Email</TableHead>
-          <TableHead>Role</TableHead>
-          <TableHead className="text-center">Actions</TableHead>
-        </TableRow>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Email</TableHead>
+            <TableHead>Role</TableHead>
+            <TableHead className="text-center">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
         <TableBody>
           {users.map((user) => (
             <TableRow key={user._id}>

@@ -160,3 +160,22 @@ export const updateRole = async (req: Request, res: Response) => {
       .json({ message: "Error updating permissions", error });
   }
 };
+
+export const getUserRole = async (req: Request, res: Response) => {
+  const user = req.user;
+
+  if (!user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  try {
+    const role = await Role.findOne({ name: user.role });
+    if (!role) {
+      return res.status(404).json({ message: "Role not found" });
+    }
+
+    return res.status(200).json(role);
+  } catch (error) {
+    console.log("Error fetching role: ", error);
+    return res.status(500).json({ message: "Error fetching user role" });
+  }
+};

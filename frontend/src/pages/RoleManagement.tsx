@@ -33,6 +33,7 @@ const RoleManagement = () => {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/role`, {
         withCredentials: true,
       });
+
       if (response.status === 200) {
         setRoles(response.data);
       } else {
