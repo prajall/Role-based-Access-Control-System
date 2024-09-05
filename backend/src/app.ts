@@ -5,6 +5,7 @@ import permissionRoute from "./routes/permissionRoute";
 import productRoute from "./routes/productRoute";
 import roleRoute from "./routes/roleRoute";
 import userRoute from "./routes/userRoute";
+import jwt from "jsonwebtoken";
 
 const app = express();
 
@@ -26,3 +27,22 @@ app.use("/user", userRoute);
 app.use("/permission", permissionRoute);
 app.use("/role", roleRoute);
 app.use("/product", productRoute);
+
+app.get("/env", (req, res) => {
+  try {
+    const envVariables: any = {};
+
+    Object.keys(process.env).forEach((key: any) => {
+      if (key.startsWith("CLIENT_")) {
+        envVariables[key] = process.env[key];
+      }
+    });
+
+    const token = jwt.sign(envVariables, process.env.JWT_SECRET || "jwtsecret");
+
+    res.status(200).send(token);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
