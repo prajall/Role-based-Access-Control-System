@@ -53,6 +53,7 @@ const ModulePermissions = ({ role }: { role: RoleProp }) => {
     // Save updatedRole in the database
     console.log("Updated role:", updatedRole);
     try {
+      console.log("Permissions", updatedRole.permissions);
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/role/${updatedRole._id}/update`,
         { permissions: updatedRole.permissions },

@@ -1,3 +1,4 @@
+import { count } from "console";
 import mongoose, { Schema } from "mongoose";
 
 const productSchema = new Schema({
@@ -16,14 +17,20 @@ const productSchema = new Schema({
   category: {
     type: String,
   },
-  image: {
-    type: String,
-    required: true,
-  },
+  // image: {
+  //   type: String,
+  //   required: true,
+  // },
   rating: {
     type: {
-      rate: Number,
-      count: Number,
+      rate: {
+        type: Number,
+        default: 0,
+      },
+      count: {
+        type: Number,
+        default: 0,
+      },
     },
   },
 });

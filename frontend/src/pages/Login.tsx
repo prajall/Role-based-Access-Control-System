@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 
 const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { appData, setAppData } = useContext(AppContext);
+  const { setAppData } = useContext(AppContext);
 
   const {
     register,
@@ -32,7 +32,11 @@ const Login = () => {
         { withCredentials: true }
       );
       if (response.status >= 200) {
-        setAppData(response.data);
+        setAppData((prev: any) => ({
+          ...prev,
+          user: response.data.user,
+          userRole: response.data.userRole,
+        }));
         toast.success("Logged in successfully");
         navigate("/");
       } else {

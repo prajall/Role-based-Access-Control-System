@@ -1,26 +1,45 @@
 import { Request, Response } from "express";
 import { Product } from "../models/productModel";
+import { uploadOnCloudinary } from "../cloudinary";
+
+import multer from "multer";
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const { title, description, price, category, rating, image } = req.body;
+    const { title, description, price, category } = req.body;
 
-    if (!title || !description || !price || !image || !category) {
+    console.log(title, description, price, category);
+
+    if (!title || !description || !price || !category) {
       return res.status(400).json({ message: "All fields are required" });
     }
+
+    // let imageUrl = "";
+    // if (req.file) {
+    //   const cloudinaryResult: any = await uploadOnCloudinary(
+    //     req.file.buffer,
+    //     "products"
+    //   );
+    //   imageUrl = cloudinaryResult.url;
+    // }
 
     const newProduct = new Product({
       title,
       description,
       price,
       category,
-      rating,
+      // image: imageUrl,
     });
+
     await newProduct.save();
 
     return res.status(201).json(newProduct);
   } catch (error) {
-    return res.status(500).json({ message: "Internal Server Error", error });
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 

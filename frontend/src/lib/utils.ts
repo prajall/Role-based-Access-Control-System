@@ -1,3 +1,5 @@
+// @ts-nocheck
+import { RoleProp } from "@/types";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -6,12 +8,19 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const checkPermission = (
-  permissionArray: any,
+  userRole: RoleProp,
   module: string,
   action: string
 ) => {
-  if (!permissionArray || Array.isArray(permissionArray)) return false;
-  return permissionArray.some(
-    (p: any) => p.module === module && !p.actions.includes(action)
+  console.log("userRole", userRole);
+
+  if (userRole?.name === "Master") return true;
+
+  if (!userRole?.permissions || !Array.isArray(userRole.permissions)) {
+    return false;
+  }
+
+  return userRole.permissions.some(
+    (p: any) => p.module === module && p.actions.includes(action)
   );
 };

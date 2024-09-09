@@ -122,6 +122,7 @@ export const updateRole = async (req: Request, res: Response) => {
   }
 
   try {
+    console.log(permissions);
     const roleDoc = await Role.findById(roleId);
     if (!roleDoc) {
       return res.status(404).json({ message: "Role not found" });

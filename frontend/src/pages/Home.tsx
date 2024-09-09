@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { AppContext } from "../contexts/Appcontext";
@@ -6,6 +6,10 @@ import { checkPermission } from "@/lib/utils";
 
 const Home = () => {
   const { appData, isLoadingAppData } = useContext(AppContext);
+
+  useEffect(() => {
+    console.log(checkPermission(appData?.userRole, "Product", "View"));
+  }, [appData?.userRole]);
   return (
     <div className="min-h-[80vh] flex flex-col justify-center">
       <p className="text-center text-teal-950 text-5xl font-bold max-w-[850px] mx-auto ">
@@ -24,16 +28,12 @@ const Home = () => {
           Login
         </Link>
       )}
-      {appData.user && (
+      {appData.user && appData.userRole && (
         <div className="flex justify-center gap-3 mt-6">
           <Button
             variant={"outline"}
             className=" border border-orange-500 text-orange-500 hover:text-orange-500 hover:bg-orange-50"
-            disabled={checkPermission(
-              appData?.userRole?.permissions,
-              "Product",
-              "View"
-            )}
+            disabled={!checkPermission(appData?.userRole, "Product", "View")}
           >
             <Link to={"/manage-products"}>View Products</Link>
           </Button>

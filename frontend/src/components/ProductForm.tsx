@@ -5,6 +5,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { X } from "lucide-react";
 import { useEffect } from "react";
+import { redirect } from "react-router-dom";
 
 const ProductForm = () => {
   const {
@@ -24,25 +25,26 @@ const ProductForm = () => {
           description: data.description,
           price: parseFloat(data.price),
           category: data.category,
-          image: data.image,
-          rating: {
-            rate: 0,
-            count: 0,
-          },
         },
         {
           withCredentials: true,
         }
       );
+
       if (response.status === 201) {
         toast.success("Product added successfully!");
-        reset(); // Reset form fields after successful submission
+        reset();
+        redirect("/manage-products");
       }
+
+      console.log("Response:", response);
     } catch (error: any) {
-      if (error.response?.data?.message)
-        toast.error(error.response?.data?.message);
       console.error("Error adding product:", error);
-      toast.error("Failed to add product.");
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Failed to add product.");
+      }
     }
   };
 
@@ -51,7 +53,7 @@ const ProductForm = () => {
   }, [watch("image")]);
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-md">
+    <div className="max-w-xl mx-auto p-6 mt-10 bg-white shadow-md rounded-md">
       <h2 className="text-2xl font-bold text-center mb-6">Add New Product</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-4">

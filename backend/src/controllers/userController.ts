@@ -85,7 +85,13 @@ export const loginUser = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "Incorrect Password" });
   }
 
-  const loggedInUser = await User.findOne({ email }).select("-password");
+  // const loggedInUser = await User.findById(user._id).select("-password");
+  const userObj = user.toObject();
+  if (userObj.password) {
+    delete userObj.password;
+  }
+
+  const userRole = await Role.findOne({ name: user.role });
 
   const token = generateToken(user._id.toString());
 
@@ -93,10 +99,10 @@ export const loginUser = async (req: Request, res: Response) => {
     .status(200)
     .cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Ensure cookies are secure in production
+      secure: process.env.NODE_ENV === "production",
       expires: new Date(Date.now() + 2592000000), // 30 days expiry
     })
-    .json({ user: loggedInUser });
+    .json({ user: userObj, userRole: userRole });
 };
 
 export const deleteUser = async (req: Request, res: Response) => {
@@ -147,8 +153,8 @@ export const getUserInfo = async (req: Request, res: Response) => {
 };
 
 export const getAllUsers = async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
+  const page = parseInt(req.query.page?.toString() || "1");
+  const limit = parseInt(req.query.limit?.toString() || "10");
   const sortField: string = req.query.sortField?.toString() || "email";
   const sortOrder = req.query.sortOrder === "desc" ? -1 : 1;
 
